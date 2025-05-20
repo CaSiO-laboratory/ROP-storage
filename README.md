@@ -4,7 +4,7 @@ Only exception is allowance from the according owner.
 # ROP-code
 Code repository for hd/hs compiler
 
-### Current applicable branch: **hd**
+### Current applicable branch: **hs**
 
 # Branch rules
 - Please commit and pull your code into the correct branch of the compiler you are using(except branch both because it allows but with conditions).
