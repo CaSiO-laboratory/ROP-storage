@@ -4,7 +4,7 @@ Only exception is allowance from the according owner.
 # ROP-code
 Code repository for hd/hs compiler
 
-### Current applicable branch: This is a special branch that allows both types to be contained, but is required to be placed in the corresponding hd/hs folder in the personal folder.
+### Current applicable branch: **hd**
 
 # Branch rules
 - Please commit and pull your code into the correct branch of the compiler you are using(except branch both because it allows but with conditions).
