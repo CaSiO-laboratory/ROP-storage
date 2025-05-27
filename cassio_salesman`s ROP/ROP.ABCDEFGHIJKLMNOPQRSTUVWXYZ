@@ -1,0 +1,201 @@
+############
+# THIS FILE WAS CREATED BY cassio_salesman (DISCORD)
+############
+# LAUNCHER:
+# FD 26 DE E9 60 0D 32 48
+############
+# TODO: DO IT YOURSELF!
+############
+
+org 0xe9e0 
+
+_$a:
+    xr0 = 0xd830, adr_of _$run
+    BL memcpy, pop er0
+    0x0202
+    xr0 = cursor_noflash, 0x01, 0x30
+    [er0] = r2
+
+############
+# DISPLAY THE BALLS
+############
+
+_$run:
+    setlr
+    DI,RT
+    xr0 = 0x01, 0x0a, adr_of bal
+    line_print
+    render.ddd4
+
+############
+# ADD ER2 VALUE(S) TO [ER8]
+############
+_posx:
+    setlr
+    er2 = 0x0001
+    er8 = 0xd820
+    [er8]+=er2, pop xr8
+    0x3030
+    0x3030
+_posy:
+    er2 = 0x0001
+    er8 = 0xd822
+    [er8]+=er2, pop xr8
+    0x30303030
+
+cmp:
+
+_$compare:
+    er0 = 0x007d
+    Delay
+    xr0 = 0xd137, 0x0a, 0x30
+    [er0] = r2
+    xr0 = 0xd83c, 0xd820
+    BL memcpy, pop er0
+    0x0001
+    xr0 = 0xd83d, 0xd822
+    BL memcpy, pop er0
+    0x0001
+
+############
+# COMPARE PART (TODO: READ THE FIRST `TODO` COMMENT)
+############
+
+minX:
+    setlr
+    er2 = 0xd820
+    er0 = [er2],r2 = 9,rt
+    r1 = 0,rt
+    er2 = 0x01, 0x00
+    er0 - er2_gt,r0 = 0 | r0 = 1,rt
+    er4 = adr_of [-2] maxX
+    er2 = adr_arith [-2] addX - adr_arith [-2] maxX, 0x30
+    er0 *= r2,er2 = er0,er0 += er4,rt
+    er14 = er0,pop xr0
+    0x00000000
+    sp = er14,pop er14
+
+maxX:
+    setlr
+    er2 = 0xd820
+    er0 = [er2],r2 = 9,rt
+    r1 = 0,rt
+    er2 = 0xA2, 0x00
+    er2 - er0_gt,r0 =0 | r0 = 1,rt
+    er4 = adr_of [-2] minY
+    er2 = adr_arith [-2] remX - adr_arith [-2] minY, 0x30
+    er0 *= r2,er2 = er0,er0 += er4,rt
+    er14 = er0,pop xr0
+    0x00000000
+    sp = er14,pop er14
+
+minY:
+    setlr
+    er2 = 0xd822
+    er0 = [er2],r2 = 9,rt
+    r1 = 0,rt
+    er2 = 0x01, 0x00
+    er0 - er2_gt,r0 =0 | r0 = 1,rt
+    er4 = adr_of [-2] maxY
+    er2 = adr_arith [-2] addY - adr_arith [-2] maxY, 0x30
+    er0 *= r2,er2 = er0,er0 += er4,rt
+    er14 = er0,pop xr0
+    0x00000000
+    sp = er14,pop er14
+    
+maxY:
+    setlr
+    er2 = 0xd822
+    er0 = [er2],r2 = 9,rt
+    r1 = 0,rt
+    er2 = 0x37, 0x00
+    er2 - er0_gt,r0 = 0 | r0 = 1,rt
+    er4 = adr_of [-2] other_value
+    er2 = adr_arith [-2] remY - adr_arith [-2] other_value, 0x30
+    er0 *= r2,er2 = er0,er0 += er4,rt
+    er14 = er0,pop xr0
+    0x00000000
+    sp = er14,pop er14
+
+other_value:
+    setlr
+    er14 = adr_of [-2] _$rs
+    sp = er14,pop er14
+    
+############
+# TODO: NOTHING, OK?
+############
+
+addX:
+    setlr
+    xr0 = 0xd850, 0x0001
+    [er0] = er2,rt
+    er14 = adr_of [-2] _$rs
+    sp = er14,pop er14
+    
+remX:
+    setlr
+    xr0 = 0xd850, 0xffff
+    [er0] = er2,rt
+    setlr
+    er14 = adr_of [-2] _$rs
+    sp = er14,pop er14
+    
+addY:
+    setlr
+    xr0 = 0xd864, 0x0001
+    [er0] = er2,rt
+    setlr
+    er14 = adr_of [-2] _$rs
+    sp = er14,pop er14
+    
+remY:
+    setlr
+    xr0 = 0xd864, 0xffff
+    [er0] = er2,rt
+    
+############
+# RESTORE & SET SP PART
+# TODO: #### THIS CODE
+############
+
+_$rs:
+    setlr
+    call 0a0e0
+    buffer_clear
+    xr0 = adr_of _$l, 0x0202
+    [er0] = er2,rt
+    xr0 = adr_of _$run, 0xd830
+    BL memcpy, pop er0
+
+_$l:
+    0x0202
+
+_$sp:
+    setlr
+    er14 = adr_of [-2] _$run
+    sp = er14, pop er14
+    0x000000000000
+    
+############
+# I LIKE THIS PART :)
+############
+
+bal:
+    str "00000"
+0x00
+
+########################
+############
+# THANK YOU FOR READ THIS MESSAGE!
+# TODO: READ THE FIRST `TODO` COMMENT!
+############
+########################
+
+# BBBBB    Y    Y   EEEEEE
+# B     B   Y    Y   E
+# BBBBB    YYYYY   EEEEEE
+# B     B      Y     E
+# BBBB        Y     EEEEEEE
+
+# NOTE: IF YOU CANNOT COMPILE THIS STUFF, DO NOTHING ;)
