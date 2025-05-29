@@ -1,0 +1,204 @@
+def d_E660 dest
+def 2F5F0 getkey
+def 29894 key_cvt
+org 0xE300
+home:
+    adr y
+    pop er14 (adr x)
+    getkey
+x:
+    hex 00 00 00 00
+y:
+    hex 00 00 00 00 00 00 00 00
+	pop xr0 (adr y DA 83)
+	setlr
+	DI,RT
+	key_cvt (00 00 00 00)
+
+key_greater:
+	er8 = er0
+	pop er2 (2F 00)
+	er0 - er2_gt,r0 = 0|r0 = 1,rt
+	pop er2 (04 00)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	pop er2 (A7 00)
+	pop er4 (adr key_less -2)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8
+
+key_less:
+	er8 = er0
+	pop er4 (40 00)
+	er2 = er0,r0 = r4,r1 = 0,pop xr4 (adr k_typing -2 00 00)
+	er0 - er2_gt,r0 = 0|r0 = 1,rt
+	pop er2 (adr_arith [-2]key_left [-2]k_typing 00)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8 (adr modifier)
+	
+k_typing:
+	pop er2 (00 00)
+	[er8] += er2,pop xr8 (adr value 0F 00)
+	er2 += er8,rt
+	call 0x161CC	;R1 = 0FH, R0 &= 0FH, R1 -= R10_EQ,RT
+	er10 = er2,rt
+	er2 = er0,er0 += er4,rt
+	er0 = er10,pop xr8 (00 00 00 00)
+	[er0] = r2
+	pop er2 (adr value)
+	er0 - er2_gt,r0 = 0|r0 = 1,rt
+	pop er2 (adr_arith [-2]jump_out [-2]cont 00)
+	pop er4 (adr cont -2)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8 (adr addr)
+cont:
+	pop er2 (00 00)
+	[er8] += er2,pop xr8 (adr store 00 00)
+	[er8] = er2,pop xr8 (00 00 02 00)
+	pop er6 (01 00)
+	call 0x10E80	 ;POP EA, R6 -= 1,_NE, POP XR4
+	adr value		 ;EA
+	hex 00 00		 ;ER4
+	adr next -2	 	 ;ER6
+	pop er12
+store:
+	hex 00 00
+	call 0x16EBC	;R0 = [EA+], R0 << 4, R10 -= 1_EQ, R1 = [EA+], R0 |= R1,...
+	hex 00 00
+	sp = er6,pop er8 (adr modifier)
+
+jump_out:
+	pop er2 (01 00)
+	[er8] += er2,pop xr8 (00 00 00 00)
+	pop er6 (adr delay -2)
+	sp = er6,pop er8 (adr keystore_1)
+
+key_left:
+	er2 = er0,er0 += er4,rt
+	[er8] = er2,pop xr8 (00 00 00 00)
+	pop er4 (1F FC)
+	er4 - er2_ne,r0 = 1|r0 = 0
+	setlr
+	DI,RT
+	pop er2 (adr_arith [-2]k_left [-2]key_right 00)
+	pop er4 (adr key_right -2)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8 (adr keystore_2)
+
+key_right:
+	pop er2
+keystore_1:
+	hex 00 00
+	[er8] = er2,pop xr8 (00 00 00 00)
+	pop er4 (1E FC)
+	er4 - er2_ne,r0 = 1|r0 = 0
+	setlr
+	DI,RT
+	pop er2 (adr_arith [-2]k_right [-2]key_ac 00)
+	pop er4 (adr key_ac -2)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8 (00 00)
+
+key_ac:
+	pop er2
+keystore_2:
+	hex 00 00
+	pop er4 (26 FC)
+	er4 - er2_ne,r0 = 1|r0 = 0
+	setlr
+	DI,RT
+	pop er2 (adr_arith [-2]k_ac [-2]other_key 00)
+	pop er4 (adr other_key -2)
+	er0 *= r2,er2 = er0,er0 += er4,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8
+
+other_key:
+	pop er6 (adr restore -2)
+	sp = er6,pop er8 (adr addr)
+
+k_ac:
+	pop er2 (00 00)
+	[er8] += er2,pop xr8 (00 00 00 00)
+	er0 = er2,rt
+	er6 = er0,er0 = er8,pop qr8 (00 00 00 00 00 00 00 00)
+	sp = er6,pop er8 (adr addr)
+
+k_right:
+	pop er2 (01 00)
+	[er8] += er2,pop xr8 (00 00 00 00)
+	pop er6 (adr next -2)
+	sp = er6,pop er8 (adr addr)
+
+k_left:
+	pop er2 (FF FF)
+	[er8] += er2,pop xr8 (adr modifier adr modifier)
+next:
+	pop er2 (00 00)
+	[er8] = er2,pop xr8 (adr addr 00 00)
+	pop er2 (00 00)
+	[er8] += er2,pop xr8 (adr store_2 00 00)
+	[er8] = er2,pop xr8 (00 00 00 00)
+	er0 = er2,rt
+	er8 = er0
+	call 0x23FFA	;R0 = R9,hex_byte,ER4 = ER0,R0 = R8,hex_byte,ER6 = ER0
+	hex 00 00 00 00 00 00 00 00		;ER8 ER10 ER12 ER14
+	setlr
+	DI,RT
+	er2 = er4,er0 -= er2,pop er4,pop er8,rt (00 00 adr string_1 +7)
+	[er8] = er2,pop xr8 (00 00 00 00)
+	er0 = er6,pop er8,pop xr4 (adr string_1 +9 00 00 00 00)
+	er2 = er0,er0 += er4,rt
+	[er8] = er2,pop xr8 (adr string_2 +8 00 00)
+	pop er0
+store_2:
+	hex 00 00
+	r0 = [er0]
+	hex_byte
+	er2 = er0,er0 += er4,rt
+	[er8] = er2,pop xr8 (00 00 00 00)
+	pop xr0 (DDD4 0600)
+	memzero
+	pop xr0 (05 05 adr string_1)
+	line_print
+	pop xr0 (05 25 adr string_2)
+	line_print
+	render.ddd4
+
+delay:
+	pop xr8 (00 05 20 00)
+restore:
+	er0 = er8
+	delay
+	DI,RT
+	pop er8 (adr length)
+	pop er2 (01 00)
+	[er8] = er2,pop xr8
+	hex 00 00 00 00
+	pop qr0 (0340 adr dest adr home 00 00)
+	hex 32 89
+length:
+	hex 0E 00 00 00
+set_sp:
+	pop er6 (adr home)
+	sp = er6,pop er8
+
+addr:
+	hex 52 D5
+
+modifier:
+	hex 00 00
+
+value:
+	hex 00 00 00 00
+
+string_1:
+	hex 41 64 64 72 3A 20 00 00 00 00
+	hex 00	;end string
+string_2:
+	hex 56 61 6C 75 65 3A 20 00 00
+	hex 00  ;end string
